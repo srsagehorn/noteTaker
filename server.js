@@ -3,6 +3,9 @@ const express = require("express");
 const path = require("path");
 const app = express();
 const PORT = process.env.PORT || 8080;
+const fs = require("fs");
+
+const notes = require("./public/assets/db.json");
 
 // start up express app to handle data parsing
 app.use(express.static("public"));
@@ -19,20 +22,32 @@ app.get("/notes", function (req, res) {
 });
 
 app.get("/api/notes", function (req, res) {
-  res.json(note);
+  res.json(notes);
 });
 
-// // post info to respective arrays based on number of tables available
-// app.post("/api/tables", function (req, res) {
-//   var newTable = req.body;
-//   if (tables.length <= 5) {
-//     tables.push(newTable);
-//     res.json(true);
-//   } else {
-//     waitlist.push(newTable);
-//     res.json(false);
-//   }
-// });
+app.post("/api/notes", (req, res) => {
+  const newNote = req.body;
+  fs.readFile("./public/assets/db.json", "utf-8", (err, data) => {
+    let allNotes = JSON.parse(data);
+    console.log(allNotes);
+    allNotes.push(newNote);
+    fs.writeFile("./public/assets/db.json", JSON.stringify(allNotes), (err) => {
+      if (err) throw err;
+      res.json(allNotes);
+    });
+  });
+});
+
+app.delete("/api/notes/", (req, res) => {
+  const remove = req.params.title;
+  notes = notes.filter((note) => {
+    return note.title != remove;
+  });
+  fs.writeFile("./public/assets/db.json", JSON.stringify(notes), (err) => {
+    if (err) throw err;
+    res.json(notes);
+  });
+});
 
 // starts the server to begin listening
 app.listen(PORT, function () {
