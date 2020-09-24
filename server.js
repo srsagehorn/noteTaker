@@ -5,7 +5,7 @@ const app = express();
 const PORT = process.env.PORT || 8080;
 const fs = require("fs");
 
-const notes = require("./public/assets/db.json");
+let notes = require("./public/assets/db.json");
 
 // start up express app to handle data parsing
 app.use(express.static("public"));
@@ -26,11 +26,12 @@ app.get("/api/notes", function (req, res) {
 });
 
 app.post("/api/notes", (req, res) => {
-  const newNote = req.body;
+  const createNote = req.body;
   fs.readFile("./public/assets/db.json", "utf-8", (err, data) => {
     let allNotes = JSON.parse(data);
-    console.log(allNotes);
-    allNotes.push(newNote);
+    createNote.id = parseInt(allNotes.length + 1);
+    allNotes.push(createNote);
+
     fs.writeFile("./public/assets/db.json", JSON.stringify(allNotes), (err) => {
       if (err) throw err;
       res.json(allNotes);
@@ -38,10 +39,10 @@ app.post("/api/notes", (req, res) => {
   });
 });
 
-app.delete("/api/notes/", (req, res) => {
-  const remove = req.params.title;
-  notes = notes.filter((note) => {
-    return note.title != remove;
+app.delete("/api/notes/:id", (req, res) => {
+  const removeID = req.params.id;
+  notes = notes.filter(function (remove) {
+    return remove.id != req.params.id;
   });
   fs.writeFile("./public/assets/db.json", JSON.stringify(notes), (err) => {
     if (err) throw err;
