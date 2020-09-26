@@ -40,7 +40,6 @@ app.post("/api/notes", (req, res) => {
 });
 
 app.delete("/api/notes/:id", (req, res) => {
-  const removeID = req.params.id;
   notes = notes.filter(function (remove) {
     return remove.id != req.params.id;
   });
