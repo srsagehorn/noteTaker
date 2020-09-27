@@ -28,20 +28,25 @@ app.get("/api/notes", function (req, res) {
 app.post("/api/notes", (req, res) => {
   const createNote = req.body;
   fs.readFile("./public/assets/db.json", "utf-8", (err, data) => {
-    let allNotes = JSON.parse(data);
-    createNote.id = parseInt(allNotes.length + 1);
-    allNotes.push(createNote);
+    notes = JSON.parse(data);
+    createNote.id = parseInt(notes.length + 1);
+    notes.push(createNote);
 
-    fs.writeFile("./public/assets/db.json", JSON.stringify(allNotes), (err) => {
+    console.log(notes);
+
+    fs.writeFile("./public/assets/db.json", JSON.stringify(notes), (err) => {
       if (err) throw err;
-      res.json(allNotes);
+      res.json(notes);
     });
   });
 });
 
+// serve index.html
+
 app.delete("/api/notes/:id", (req, res) => {
-  notes = notes.filter(function (remove) {
-    return remove.id != req.params.id;
+  console.log(req.params.id);
+  notes = notes.filter(function (notes) {
+    return notes.id != req.params.id;
   });
   fs.writeFile("./public/assets/db.json", JSON.stringify(notes), (err) => {
     if (err) throw err;
